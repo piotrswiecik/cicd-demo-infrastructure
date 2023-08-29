@@ -1,0 +1,34 @@
+[jenkinscontroller]
+${controller_ip_addr}
+
+[jenkinsagent]
+%{ for ip_addr in agent_ip_addrs ~}
+${ip_addr}
+%{ endfor ~}
+
+[jenkins:children]
+jenkinscontroller
+jenkinsagent
+
+[sonar]
+${sonar_ip_addr}
+
+[cicd:children]
+jenkins
+sonar
+
+[cicd:vars]
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+
+[jenkins:vars]
+ansible_ssh_user=ubuntu
+
+[jenkinscontroller:vars]
+ansible_ssh_private_key_file=${controller_ssh_keyfile}
+
+[jenkinsagent:vars]
+ansible_ssh_private_key_file=${agent_ssh_keyfile}
+
+[sonar:vars]
+ansible_ssh_user=ubuntu
+ansible_ssh_private_key_file=${sonar_ssh_keyfile}

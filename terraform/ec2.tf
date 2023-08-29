@@ -55,6 +55,7 @@ resource "local_file" "jenkins_agent_key" {
 resource "aws_instance" "jenkins_agent" {
   ami             = data.aws_ami.latest_ubuntu.id
   instance_type   = "t2.micro"
+  count = 1
   key_name        = aws_key_pair.jenkins_agent.key_name
   subnet_id       = aws_subnet.cicd_demo.id
   security_groups = [aws_security_group.jenkins_agent.id]
