@@ -109,3 +109,36 @@ resource "aws_security_group" "jenkins_agent" {
   }
 
 }
+
+resource "aws_security_group" "sonarqube" {
+  vpc_id = aws_vpc.cicd_demo.id
+
+  tags = {
+    "Name" = "sg-eu-central-1-sonarqube"
+  }
+
+  ingress {
+    description = "Allow SSH from anywhere for administration"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "Allow access to Sonarqube web server"
+    from_port   = 9000
+    to_port     = 9000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "Allow all outbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+}
