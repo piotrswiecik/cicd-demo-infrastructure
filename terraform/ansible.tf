@@ -7,6 +7,6 @@ resource "local_file" "ansible_inventory" {
     agent_ssh_keyfile      = local_file.jenkins_agent_key.filename
     sonar_ssh_keyfile      = local_file.sonarqube_key.filename
   })
-  filename        = format("%s/%s", abspath(path.root), "inventory")
+  filename        = format("%s/%s", abspath(path.root), "../resources/inventory")
   file_permission = "0600"
 }

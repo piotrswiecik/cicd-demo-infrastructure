@@ -20,7 +20,7 @@ resource "aws_key_pair" "jenkins_controller" {
 
 resource "local_file" "jenkins_controller_key" {
   content         = tls_private_key.jenkins_controller.private_key_pem
-  filename        = "ec2-eu-central-1-jenkins-controller.pem"
+  filename        = format("%s/%s", abspath(path.root), "../resources/ec2-eu-central-1-jenkins-controller.pem")
   file_permission = "0600"
 }
 
@@ -48,14 +48,14 @@ resource "aws_key_pair" "jenkins_agent" {
 
 resource "local_file" "jenkins_agent_key" {
   content         = tls_private_key.jenkins_agent.private_key_pem
-  filename        = "ec2-eu-central-1-jenkins-agent.pem"
+  filename        = format("%s/%s", abspath(path.root), "../resources/ec2-eu-central-1-jenkins-agent.pem")
   file_permission = "0600"
 }
 
 resource "aws_instance" "jenkins_agent" {
   ami             = data.aws_ami.latest_ubuntu.id
   instance_type   = "t2.micro"
-  count = 1
+  count           = 1
   key_name        = aws_key_pair.jenkins_agent.key_name
   subnet_id       = aws_subnet.cicd_demo.id
   security_groups = [aws_security_group.jenkins_agent.id]
@@ -77,7 +77,7 @@ resource "aws_key_pair" "sonarqube" {
 
 resource "local_file" "sonarqube_key" {
   content         = tls_private_key.sonarqube.private_key_pem
-  filename        = "ec2-eu-central-1-sonarqube.pem"
+  filename        = format("%s/%s", abspath(path.root), "../resources/ec2-eu-central-1-sonarqube.pem")
   file_permission = "0600"
 }
 
