@@ -36,5 +36,7 @@ terraform.rc
 # EC2 keys
 *.pem
 
-# generated inventory file
+# generated resources
+resources/
 inventory
+*.pem
