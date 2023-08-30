@@ -1,11 +1,13 @@
 - name: create jenkins group
   group:
     name: jenkins
+    gid: 2000
     state: present
 
 - name: create jenkins user
   user:
     name: jenkins
+    uid: 2000
     groups:
       - jenkins
       - docker
@@ -15,8 +17,8 @@
   file:
     path: /home/jenkins/jenkins_home
     state: directory
-    owner: jenkins
-    group: jenkins
+    owner: 1000
+    group: 1000
 
 - name: parse jenkins agent pem key
   set_fact:
@@ -28,3 +30,41 @@
     dest: /home/jenkins/casc.yaml
     owner: jenkins
     group: jenkins
+
+- name: parse plugins list template
+  template:
+    src: plugins.txt.j2
+    dest: /home/jenkins/plugins.txt
+    owner: jenkins
+    group: jenkins
+
+- name: parse controller dockerfile
+  template:
+      src: Dockerfile.j2
+      dest: /home/jenkins/Dockerfile
+      owner: jenkins
+      group: jenkins
+
+- name: build jenkins controller image
+  community.docker.docker_image:
+    build:
+      path: /home/jenkins
+      dockerfile: Dockerfile
+      args:
+        JENKINS_VERSION: "{{ jenkins_controller_version }}"
+    name: "jenkins_controller:default"
+    source: build
+
+- name: run jenkins controller
+  community.docker.docker_container:
+    name: jenkins_controller
+    image: "jenkins_controller:default"
+    state: started
+    restart: true
+    pull: false
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - "/home/jenkins/jenkins_home:/var/jenkins_home"
+      - "/home/jenkins/casc.yaml:/usr/share/jenkins/ref/casc.yaml"
