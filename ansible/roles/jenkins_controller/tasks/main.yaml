@@ -1,0 +1,30 @@
+- name: create jenkins group
+  group:
+    name: jenkins
+    state: present
+
+- name: create jenkins user
+  user:
+    name: jenkins
+    groups:
+      - jenkins
+      - docker
+    home: /home/jenkins
+
+- name: create jenkins_home directory
+  file:
+    path: /home/jenkins/jenkins_home
+    state: directory
+    owner: jenkins
+    group: jenkins
+
+- name: parse jenkins agent pem key
+  set_fact:
+    jenkins_agent_pem_key_content: "{{ lookup('file', jenkins_agent_ssh_private_key_path) }}"
+
+- name: pars casc template
+  template:
+    src: casc.yaml.j2
+    dest: /home/jenkins/casc.yaml
+    owner: jenkins
+    group: jenkins

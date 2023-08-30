@@ -4,7 +4,6 @@
 
   vars:
 
-
   pre_tasks:
   - name: install core apt packages
     apt:
@@ -15,4 +14,17 @@
         - apt-transport-https
   
   roles:
-    - docker  
+    - docker
+
+- hosts: jenkinscontroller
+  become: true
+
+  vars:
+    jenkins_controller_version: 2.401.2-lts-jdk11
+    jenkins_controller_default_user: jenkins
+    jenkins_controller_default_password: jenkins
+    jenkins_agent_ssh_private_key_path: ../resources/ec2-eu-central-1-jenkins-agent.pem  # TODO dynamic generation
+
+  roles:
+    - jenkins_controller
+  

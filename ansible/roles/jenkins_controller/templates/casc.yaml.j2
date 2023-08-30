@@ -1,0 +1,47 @@
+jenkins:
+  systemMessage: "Jenkins IaC setup by capricorndev.pl"
+  numExecutors: 0
+  securityRealm:
+    local:
+      allowsSignup: false
+      enableCaptcha: false
+      users:
+        - id: {{ jenkins_controller_default_user }}
+          password: {{ jenkins_controller_default_password }}
+  authorizationStrategy:
+    globalMatrix:
+      permissions:
+        - "USER:Overall/Administer:admin"
+
+  nodes:
+  {% for host in groups['jenkinsagent'] %}
+  - permanent:
+      labelString: "docker-agent-{{ host }}"
+      launcher:
+        ssh:
+          credentialsId: "ec2_jenkins_agent_ssh_credentials"
+          host: "{{ host }}"
+          port: 22
+          sshHostKeyVerificationStrategy: "nonVerifyingKeyVerificationStrategy"
+      name: "docker-agent-{{ host }}"
+      remoteFS: "/home/jenkins/agent"
+      retentionStrategy: "always"
+  {% endfor %}
+
+security:
+  gitHostKeyVerificationConfiguration:
+    sshHostKeyVerificationStrategy: "acceptFirstConnectionStrategy"
+
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - basicSSHUserPrivateKey:
+              scope: SYSTEM
+              id: ec2_jenkins_agent_ssh_credentials
+              username: jenkins
+              description: "PEM key used for Jenkins agent SSH access"
+              privateKeySource:
+                directEntry:
+                  privateKey: |
+                    {{ jenkins_agent_pem_key_content|indent(20)}}
