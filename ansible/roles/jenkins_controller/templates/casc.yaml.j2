@@ -11,7 +11,7 @@ jenkins:
   authorizationStrategy:
     globalMatrix:
       permissions:
-        - "USER:Overall/Administer:admin"
+        - "USER:Overall/Administer:{{ jenkins_controller_default_user }}"
   nodes:
   {% for host in groups['jenkinsagent'] %}
   - permanent:
